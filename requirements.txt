@@ -1,8 +1,8 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
 
-# PyTorch & Torchvision (Lightweight CPU builds optimized for Streamlit Cloud)
-torch==2.5.1
-torchvision==0.20.1
+# PyTorch & Torchvision (Explicit CPU-only builds; zero CUDA/NVIDIA/Triton bloat)
+torch==2.5.1+cpu
+torchvision==0.20.1+cpu
 
 # Image Processing
 Pillow>=10.0.0
