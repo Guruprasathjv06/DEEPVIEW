@@ -1375,9 +1375,9 @@ elif nav_selection == "🔮 Real-Time Prediction":
             chosen_class_idx = target_classes.index(chosen_class_str)
             if st.button(f"🎯 Load Test Sample of {chosen_class_str.upper()}", type="primary", use_container_width=True):
                 if is_cifar_domain:
-                    raw_ds = datasets.CIFAR10(root="data", train=False, download=False, transform=None)
+                    raw_ds = datasets.CIFAR10(root="data", train=False, download=True, transform=None)
                 else:
-                    raw_ds = datasets.MNIST(root="data", train=False, download=False, transform=None)
+                    raw_ds = datasets.MNIST(root="data", train=False, download=True, transform=None)
 
                 # Find all matching samples of this class
                 matches = [idx for idx, (_, y) in enumerate(raw_ds) if y == chosen_class_idx]
@@ -1393,7 +1393,7 @@ elif nav_selection == "🔮 Real-Time Prediction":
         else:
             if st.button(f"🎲 Draw Random Sample from {active_domain_name} Test Set", type="primary", use_container_width=True):
                 if is_cifar_domain:
-                    raw_cifar = datasets.CIFAR10(root="data", train=False, download=False, transform=None)
+                    raw_cifar = datasets.CIFAR10(root="data", train=False, download=True, transform=None)
                     rand_idx = np.random.randint(0, len(raw_cifar))
                     raw_sample, gt_label = raw_cifar[rand_idx]
                     input_pil_img = ensure_pil_image(raw_sample)
@@ -1404,7 +1404,7 @@ elif nav_selection == "🔮 Real-Time Prediction":
                     st.session_state["cached_test_ds"] = "CIFAR-10"
 
                 else:
-                    raw_mnist = datasets.MNIST(root="data", train=False, download=False, transform=None)
+                    raw_mnist = datasets.MNIST(root="data", train=False, download=True, transform=None)
                     rand_idx = np.random.randint(0, len(raw_mnist))
                     raw_sample, gt_label = raw_mnist[rand_idx]
                     input_pil_img = ensure_pil_image(raw_sample)
