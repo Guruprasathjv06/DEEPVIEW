@@ -1,7 +1,6 @@
-# PyTorch and Torchvision (Official CPU build; for CUDA, install torch with cu121 index)
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.5.1+cpu
-torchvision==0.20.1+cpu
+# PyTorch and Torchvision
+torch>=2.2.0
+torchvision>=0.17.0
 
 # Experiment Tracking
 wandb>=0.16.0
