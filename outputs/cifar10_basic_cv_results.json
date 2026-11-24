@@ -1,0 +1,63 @@
+{
+    "model_name": "basic",
+    "dataset_name": "CIFAR-10",
+    "n_splits": 5,
+    "accuracy_mean": 0.51956,
+    "accuracy_std": 0.006308914328155045,
+    "loss_mean": 1.3502,
+    "loss_std": 0.0031565804282482394,
+    "f1_macro_mean": 0.51956,
+    "f1_macro_std": 0.006308914328155045,
+    "fold_details": [
+        {
+            "fold": 1,
+            "val_loss": 1.3534,
+            "val_accuracy": 0.5131,
+            "val_precision_macro": 0.5161,
+            "val_recall_macro": 0.5111,
+            "val_f1_macro": 0.5131,
+            "best_epoch": 3,
+            "checkpoint_path": "checkpoints\\cifar10_basic_fold1_best.pt"
+        },
+        {
+            "fold": 2,
+            "val_loss": 1.3544,
+            "val_accuracy": 0.5112,
+            "val_precision_macro": 0.5142,
+            "val_recall_macro": 0.5092,
+            "val_f1_macro": 0.5112,
+            "best_epoch": 3,
+            "checkpoint_path": "checkpoints\\cifar10_basic_fold2_best.pt"
+        },
+        {
+            "fold": 3,
+            "val_loss": 1.3463,
+            "val_accuracy": 0.5273,
+            "val_precision_macro": 0.5303,
+            "val_recall_macro": 0.5253,
+            "val_f1_macro": 0.5273,
+            "best_epoch": 3,
+            "checkpoint_path": "checkpoints\\cifar10_basic_fold3_best.pt"
+        },
+        {
+            "fold": 4,
+            "val_loss": 1.349,
+            "val_accuracy": 0.522,
+            "val_precision_macro": 0.525,
+            "val_recall_macro": 0.52,
+            "val_f1_macro": 0.522,
+            "best_epoch": 3,
+            "checkpoint_path": "checkpoints\\cifar10_basic_fold4_best.pt"
+        },
+        {
+            "fold": 5,
+            "val_loss": 1.3479,
+            "val_accuracy": 0.5242,
+            "val_precision_macro": 0.5272,
+            "val_recall_macro": 0.5222,
+            "val_f1_macro": 0.5242,
+            "best_epoch": 3,
+            "checkpoint_path": "checkpoints\\cifar10_basic_fold5_best.pt"
+        }
+    ]
+}

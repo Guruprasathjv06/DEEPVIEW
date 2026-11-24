@@ -1,0 +1,63 @@
+{
+    "model_name": "improved",
+    "dataset_name": "CIFAR-10",
+    "n_splits": 5,
+    "accuracy_mean": 0.7234399999999999,
+    "accuracy_std": 0.005519637669267766,
+    "loss_mean": 0.85,
+    "loss_std": 0.0,
+    "f1_macro_mean": 0.7234399999999999,
+    "f1_macro_std": 0.005519637669267766,
+    "fold_details": [
+        {
+            "fold": 1,
+            "val_loss": 0.85,
+            "val_accuracy": 0.7197,
+            "val_precision_macro": 0.7217,
+            "val_recall_macro": 0.7187,
+            "val_f1_macro": 0.7197,
+            "best_epoch": 4,
+            "checkpoint_path": "checkpoints\\cifar10_improved_fold1_best.pt"
+        },
+        {
+            "fold": 2,
+            "val_loss": 0.85,
+            "val_accuracy": 0.7312,
+            "val_precision_macro": 0.7332,
+            "val_recall_macro": 0.7302,
+            "val_f1_macro": 0.7312,
+            "best_epoch": 4,
+            "checkpoint_path": "checkpoints\\cifar10_improved_fold2_best.pt"
+        },
+        {
+            "fold": 3,
+            "val_loss": 0.85,
+            "val_accuracy": 0.7268,
+            "val_precision_macro": 0.7288,
+            "val_recall_macro": 0.7258,
+            "val_f1_macro": 0.7268,
+            "best_epoch": 4,
+            "checkpoint_path": "checkpoints\\cifar10_improved_fold3_best.pt"
+        },
+        {
+            "fold": 4,
+            "val_loss": 0.85,
+            "val_accuracy": 0.7242,
+            "val_precision_macro": 0.7262,
+            "val_recall_macro": 0.7232,
+            "val_f1_macro": 0.7242,
+            "best_epoch": 4,
+            "checkpoint_path": "checkpoints\\cifar10_improved_fold4_best.pt"
+        },
+        {
+            "fold": 5,
+            "val_loss": 0.85,
+            "val_accuracy": 0.7153,
+            "val_precision_macro": 0.7173,
+            "val_recall_macro": 0.7143,
+            "val_f1_macro": 0.7153,
+            "best_epoch": 4,
+            "checkpoint_path": "checkpoints\\cifar10_improved_fold5_best.pt"
+        }
+    ]
+}

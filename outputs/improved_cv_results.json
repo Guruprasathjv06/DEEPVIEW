@@ -1,0 +1,75 @@
+{
+    "model_name": "improved",
+    "n_splits": 5,
+    "epochs": 2,
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "optimizer": "adam",
+    "accuracy_mean": 0.9899166666666666,
+    "accuracy_std": 0.00047140452079103473,
+    "loss_mean": 0.031841130159733194,
+    "loss_std": 0.0024573992792460172,
+    "precision_macro_mean": 0.9899398549324037,
+    "precision_macro_std": 0.0005016306997377974,
+    "recall_macro_mean": 0.9898630465542906,
+    "recall_macro_std": 0.0004967576767205072,
+    "f1_macro_mean": 0.9898817042912926,
+    "f1_macro_std": 0.0004956287850397883,
+    "fold_details": [
+        {
+            "fold": 1,
+            "val_loss": 0.033688007906079294,
+            "val_accuracy": 0.9893333333333333,
+            "val_precision_macro": 0.9892777094300719,
+            "val_recall_macro": 0.9893646354693653,
+            "val_f1_macro": 0.9892981453393812,
+            "best_epoch": 2,
+            "total_time_seconds": 132.43104767799377,
+            "checkpoint_path": "checkpoints\\improved_fold1_best.pt"
+        },
+        {
+            "fold": 2,
+            "val_loss": 0.029732892421384653,
+            "val_accuracy": 0.9905,
+            "val_precision_macro": 0.9905724046693184,
+            "val_recall_macro": 0.9904619786256397,
+            "val_f1_macro": 0.9904938878171048,
+            "best_epoch": 2,
+            "total_time_seconds": 118.00945043563843,
+            "checkpoint_path": "checkpoints\\improved_fold2_best.pt"
+        },
+        {
+            "fold": 3,
+            "val_loss": 0.03577259032645573,
+            "val_accuracy": 0.9895,
+            "val_precision_macro": 0.989629394649079,
+            "val_recall_macro": 0.9892748290005574,
+            "val_f1_macro": 0.9894193358936662,
+            "best_epoch": 2,
+            "total_time_seconds": 145.52174139022827,
+            "checkpoint_path": "checkpoints\\improved_fold3_best.pt"
+        },
+        {
+            "fold": 4,
+            "val_loss": 0.029734754043320814,
+            "val_accuracy": 0.9904166666666666,
+            "val_precision_macro": 0.9904741674012703,
+            "val_recall_macro": 0.9903913098954179,
+            "val_f1_macro": 0.9904187935947306,
+            "best_epoch": 2,
+            "total_time_seconds": 297.22978377342224,
+            "checkpoint_path": "checkpoints\\improved_fold4_best.pt"
+        },
+        {
+            "fold": 5,
+            "val_loss": 0.03027740610142549,
+            "val_accuracy": 0.9898333333333333,
+            "val_precision_macro": 0.989745598512279,
+            "val_recall_macro": 0.9898224797804727,
+            "val_f1_macro": 0.9897783588115795,
+            "best_epoch": 2,
+            "total_time_seconds": 122.32464575767517,
+            "checkpoint_path": "checkpoints\\improved_fold5_best.pt"
+        }
+    ]
+}
