@@ -10,6 +10,8 @@ font = "sans serif"
 enableCORS = false
 enableXsrfProtection = false
 headless = true
+fileWatcherType = "none"
+runOnSave = false
 
 [browser]
 gatherUsageStats = false

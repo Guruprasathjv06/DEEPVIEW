@@ -19,3 +19,17 @@ services:
         value: "false"
       - key: STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION
         value: "false"
+      - key: STREAMLIT_SERVER_FILE_WATCHER_TYPE
+        value: "none"
+      - key: STREAMLIT_SERVER_RUN_ON_SAVE
+        value: "false"
+      - key: OMP_NUM_THREADS
+        value: "1"
+      - key: MKL_NUM_THREADS
+        value: "1"
+      - key: OPENBLAS_NUM_THREADS
+        value: "1"
+      - key: VECLIB_MAXIMUM_THREADS
+        value: "1"
+      - key: NUMEXPR_NUM_THREADS
+        value: "1"

@@ -35,6 +35,14 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+# Performance: Limit thread contention on fractional vCPU cloud containers (Render free tier)
+torch.set_num_threads(2)
+try:
+    torch.set_num_interop_threads(1)
+except RuntimeError:
+    pass
+
 from PIL import Image
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
@@ -531,13 +539,58 @@ def load_saved_results(dataset_name: str = "MNIST") -> Tuple[Optional[pd.DataFra
     return df, results_json
 
 
+@st.cache_data
 def get_available_checkpoints() -> List[str]:
-    """Scan the checkpoints directory for saved PyTorch model weights."""
+    """Scan the checkpoints directory for saved PyTorch model weights (cached)."""
     ckpt_dir = "checkpoints"
     if not os.path.exists(ckpt_dir):
         return []
     pts = glob.glob(os.path.join(ckpt_dir, "*.pt"))
     return sorted(pts)
+
+
+@st.cache_resource
+def get_cached_model(model_type: str, in_channels: int, ckpt_path: str) -> nn.Module:
+    """Load model architecture and weights from checkpoint with in-memory caching for instant inference."""
+    model = get_model(model_type, in_channels=in_channels, num_classes=10)
+    ckpt_data = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+    if isinstance(ckpt_data, dict) and "model_state_dict" in ckpt_data:
+        model.load_state_dict(ckpt_data["model_state_dict"])
+    else:
+        model.load_state_dict(ckpt_data)
+    model.eval()
+    return model
+
+
+@st.cache_resource
+def get_cached_test_dataset(dataset_name: str):
+    """Download and cache test dataset in memory for instant zero-latency sample drawing."""
+    if dataset_name == "MNIST":
+        return datasets.MNIST(root="data", train=False, download=True, transform=None)
+    else:
+        return datasets.CIFAR10(root="data", train=False, download=True, transform=None)
+
+
+@st.cache_data
+def get_class_sample_indices(dataset_name: str, class_idx: int) -> List[int]:
+    """Fast vectorized index lookup for target class without iterating through 10,000 images."""
+    ds = get_cached_test_dataset(dataset_name)
+    targets = np.array(ds.targets)
+    matches = np.where(targets == class_idx)[0]
+    return matches.tolist()
+
+
+@st.cache_data
+def load_cv_json(filepath: str) -> Optional[dict]:
+    """Cache JSON cross-validation results to avoid repeated disk reads."""
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, "r") as f:
+                return json.load(f)
+        except Exception:
+            return None
+    return None
+
 
 
 def ensure_pil_image(img_input: Union[Image.Image, torch.Tensor, np.ndarray]) -> Image.Image:
@@ -837,7 +890,7 @@ elif nav_selection == "🧠 Model & Dataset Explorer":
             )
 
             if st.button("🎲 Preview 8 Random MNIST Samples", type="primary"):
-                raw_mnist = datasets.MNIST(root="data", train=False, download=False, transform=None)
+                raw_mnist = get_cached_test_dataset("MNIST")
                 indices = np.random.choice(len(raw_mnist), 8, replace=False)
 
                 cols = st.columns(8)
@@ -859,7 +912,7 @@ elif nav_selection == "🧠 Model & Dataset Explorer":
             )
 
             if st.button("🎲 Preview 8 Random CIFAR-10 Samples", type="primary"):
-                raw_cifar = datasets.CIFAR10(root="data", train=False, download=False, transform=None)
+                raw_cifar = get_cached_test_dataset("CIFAR-10")
                 indices = np.random.choice(len(raw_cifar), 8, replace=False)
 
                 cols = st.columns(8)
@@ -1198,9 +1251,8 @@ elif nav_selection == "📊 5-Fold CV & Evaluation":
 
         with col_b:
             st.markdown(f"##### 🔹 Basic CNN (5 Folds - {bench_name})")
-            if os.path.exists(basic_json):
-                with open(basic_json, "r") as f:
-                    b_data = json.load(f)
+            b_data = load_cv_json(basic_json)
+            if b_data is not None:
                 b_folds = pd.DataFrame(b_data["fold_details"])
                 display_cols = ["fold", "val_accuracy", "val_loss", "val_f1_macro", "val_precision_macro", "val_recall_macro"]
                 b_folds["val_accuracy"] = b_folds["val_accuracy"].apply(lambda x: f"{float(x) * 100:.2f}%")
@@ -1213,9 +1265,8 @@ elif nav_selection == "📊 5-Fold CV & Evaluation":
 
         with col_i:
             st.markdown(f"##### 🌟 Improved CNN (5 Folds - {bench_name})")
-            if os.path.exists(improved_json):
-                with open(improved_json, "r") as f:
-                    i_data = json.load(f)
+            i_data = load_cv_json(improved_json)
+            if i_data is not None:
                 i_folds = pd.DataFrame(i_data["fold_details"])
                 display_cols = ["fold", "val_accuracy", "val_loss", "val_f1_macro", "val_precision_macro", "val_recall_macro"]
                 i_folds["val_accuracy"] = i_folds["val_accuracy"].apply(lambda x: f"{float(x) * 100:.2f}%")
@@ -1374,13 +1425,11 @@ elif nav_selection == "🔮 Real-Time Prediction":
             chosen_class_str = st.selectbox(f"Select Target {active_domain_name} Class:", target_classes, index=0)
             chosen_class_idx = target_classes.index(chosen_class_str)
             if st.button(f"🎯 Load Test Sample of {chosen_class_str.upper()}", type="primary", use_container_width=True):
-                if is_cifar_domain:
-                    raw_ds = datasets.CIFAR10(root="data", train=False, download=True, transform=None)
-                else:
-                    raw_ds = datasets.MNIST(root="data", train=False, download=True, transform=None)
+                target_ds_name = "CIFAR-10" if is_cifar_domain else "MNIST"
+                raw_ds = get_cached_test_dataset(target_ds_name)
 
-                # Find all matching samples of this class
-                matches = [idx for idx, (_, y) in enumerate(raw_ds) if y == chosen_class_idx]
+                # Vectorized index lookup (instantaneous without disk loop)
+                matches = get_class_sample_indices(target_ds_name, chosen_class_idx)
                 sample_idx = int(np.random.choice(matches)) if matches else 0
                 sample_raw, sample_gt = raw_ds[sample_idx]
                 input_pil_img = ensure_pil_image(sample_raw)
@@ -1392,27 +1441,16 @@ elif nav_selection == "🔮 Real-Time Prediction":
 
         else:
             if st.button(f"🎲 Draw Random Sample from {active_domain_name} Test Set", type="primary", use_container_width=True):
-                if is_cifar_domain:
-                    raw_cifar = datasets.CIFAR10(root="data", train=False, download=True, transform=None)
-                    rand_idx = np.random.randint(0, len(raw_cifar))
-                    raw_sample, gt_label = raw_cifar[rand_idx]
-                    input_pil_img = ensure_pil_image(raw_sample)
-                    ground_truth_label = int(gt_label)
+                target_ds_name = "CIFAR-10" if is_cifar_domain else "MNIST"
+                raw_ds = get_cached_test_dataset(target_ds_name)
+                rand_idx = int(np.random.randint(0, len(raw_ds)))
+                raw_sample, gt_label = raw_ds[rand_idx]
+                input_pil_img = ensure_pil_image(raw_sample)
+                ground_truth_label = int(gt_label)
 
-                    st.session_state["cached_test_img"] = input_pil_img
-                    st.session_state["cached_test_lbl"] = ground_truth_label
-                    st.session_state["cached_test_ds"] = "CIFAR-10"
-
-                else:
-                    raw_mnist = datasets.MNIST(root="data", train=False, download=True, transform=None)
-                    rand_idx = np.random.randint(0, len(raw_mnist))
-                    raw_sample, gt_label = raw_mnist[rand_idx]
-                    input_pil_img = ensure_pil_image(raw_sample)
-                    ground_truth_label = int(gt_label)
-
-                    st.session_state["cached_test_img"] = input_pil_img
-                    st.session_state["cached_test_lbl"] = ground_truth_label
-                    st.session_state["cached_test_ds"] = "MNIST"
+                st.session_state["cached_test_img"] = input_pil_img
+                st.session_state["cached_test_lbl"] = ground_truth_label
+                st.session_state["cached_test_ds"] = target_ds_name
 
             # Retrieve from session state if matching active domain
             if "cached_test_img" in st.session_state:
@@ -1446,14 +1484,8 @@ elif nav_selection == "🔮 Real-Time Prediction":
             elif not is_cifar_domain and is_ckpt_cifar:
                 st.warning("⚠️ Warning: Selected checkpoint is trained on CIFAR-10 objects. Switch to an MNIST checkpoint for digit recognition.")
 
-            # Load model instance
-            model = get_model(model_type, in_channels=in_channels, num_classes=10)
-            ckpt_data = torch.load(selected_ckpt, map_location="cpu", weights_only=False)
-            if "model_state_dict" in ckpt_data:
-                model.load_state_dict(ckpt_data["model_state_dict"])
-            else:
-                model.load_state_dict(ckpt_data)
-            model.eval()
+            # Load model instance via high-speed in-memory cache
+            model = get_cached_model(model_type, in_channels, selected_ckpt)
 
             # Preprocess PIL image for the network
             if in_channels == 3:
@@ -1549,6 +1581,7 @@ elif nav_selection == "🔮 Real-Time Prediction":
             ax.spines["bottom"].set_alpha(0.5)
             plt.tight_layout()
             st.pyplot(fig)
+            plt.close(fig)
 
         else:
             st.info(f"👈 Click 'Draw Random Sample from {active_domain_name} Test Set' or upload an image to run real-time predictions.")
