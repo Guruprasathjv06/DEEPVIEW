@@ -1,8 +1,9 @@
---extra-index-url https://download.pytorch.org/whl/cpu
+--index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://pypi.org/simple
 
-# PyTorch & Torchvision (Explicit CPU-only builds; zero CUDA/NVIDIA/Triton bloat)
-torch==2.5.1+cpu
-torchvision==0.20.1+cpu
+# PyTorch & Torchvision (CPU-only index; zero CUDA/NVIDIA/Triton bloat)
+torch>=2.2.0,<2.6.0
+torchvision>=0.17.0,<0.21.0
 
 # Image Processing
 Pillow>=10.0.0
